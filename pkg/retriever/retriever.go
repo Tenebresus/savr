@@ -1,7 +1,8 @@
 package retriever
 
 import (
-	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/tenebresus/savr/pkg/retriever/ah"
 )
@@ -16,9 +17,16 @@ func Run() {
     runners = append(runners, ah.Initialize())
 
     for _, runner := range runners {
-        json := runner.Run()
-        fmt.Println(string(json))
+        bonusData := runner.Run()
+        postRequest(bonusData)
     }
+
+}
+
+func postRequest(bonusData []byte) {
+
+    data := strings.NewReader(string(bonusData))
+    http.Post("http://127.0.0.1:8080/api/v1/bonus", "application/json", data)
 
 }
 

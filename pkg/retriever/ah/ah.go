@@ -5,8 +5,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/tenebresus/savr/pkg/date"
 )
 
 type AH struct {}
@@ -16,6 +19,8 @@ type authResT struct {
 	RefreshToken string `json:"refresh_token"`
 	ExpiresIn    int    `json:"expires_in"`
 }
+
+const date_layout string = "2006-01-02"
 
 var ret_array []map[string]string
 var wg sync.WaitGroup
@@ -70,14 +75,22 @@ func getBonusByGroup(access_token string, group string, is_promotion bool) {
 
 func getBonusByProduct(product bonusGroupT) {
 
-    entry := map[string]string {
-        "bonus_description": product.SegmentDescription,
-        "start_date": product.BonusStartDate,
-        "end_date": product.BonusEndDate,
-        "discount_description": product.DiscountDescription,
-    }
+    if product.SegmentDescription != "" {
 
-    ret_array = append(ret_array, entry)
+        start_date_int := date.Parse(date_layout, product.BonusStartDate)
+        end_date_int := date.Parse(date_layout, product.BonusEndDate)
+
+        entry := map[string]string {
+            "supermarket": "ah",
+            "bonus_description": product.SegmentDescription,
+            "start_date": strconv.Itoa(int(start_date_int)),
+            "end_date": strconv.Itoa(int(end_date_int)),
+            "discount_description": product.DiscountDescription,
+            "link": "https://www.ah.nl/bonus?id=" + product.ID,
+        }
+
+        ret_array = append(ret_array, entry)
+    }
 }
 
 func getAuthToken() []byte {
