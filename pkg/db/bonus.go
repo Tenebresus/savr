@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+    "fmt"
 )
 
-type bonusDB struct {
+type BonusDBO struct {
 
     Id          int    `json:"id"`
     Store       string `json:"store"`
@@ -40,7 +41,22 @@ func GetAllBonus() []byte {
         log.Fatal(err)
     }
 
-    return processRows(rows)
+    _, ret := processRows(rows)
+    return ret
+}
+
+func GetAllBonusDBO() []BonusDBO {
+
+    db := connect("savr") 
+    defer db.Close()
+
+    rows, err := db.Query("SELECT * FROM bonus")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    ret, _ := processRows(rows)
+    return ret
 }
 
 func GetBonusByStore(store string) []byte {
@@ -53,7 +69,8 @@ func GetBonusByStore(store string) []byte {
         log.Fatal(err)
     }
 
-    return processRows(rows)
+    _, ret := processRows(rows)
+    return ret
 }
 
 func PostBonus(data []byte) {
@@ -67,21 +84,23 @@ func PostBonus(data []byte) {
         log.Fatal(err)
     }
 
+    query := ""
+
     for _, bonusPost := range bonusPostData {
 
-        log.Println("testing")
-
         start_date, end_date := getDates(bonusPost)
+        // TODO: Fix this query; the query looks fine, but the DB doesn't process it? When run by hand, the query works perfectly fine. Issue with mysql golang driver?
+        query += fmt.Sprintf("call InsertBonus(\"%s\", %d, %d, \"%s\", \"test\", \"%s\");\n", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Link)
 
-        // TODO: fix the 'too many open connections' issue. Put all the values in one insert statement instead of an insert statement for each bonusPost
-        _, err = db.Query("INSERT INTO bonus (store, start_date, end_date, description, discount, link) VALUES (?, ?, ?, ?, ?, ?)", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Discount_description, bonusPost.Link)
+    }
 
-        if err != nil {
-            log.Println(err)
-        } else {
-            log.Println("Successfully inserted new row into the table!")
-        }
+    log.Println(query)
+    _, err = db.Query(query)
 
+    if err != nil {
+        log.Println(err)
+    } else {
+        log.Println("Successfully inserted rows into the table!")
     }
 }
 
@@ -100,33 +119,14 @@ func getDates(bonus bonusPost) (int, int) {
         return start_date, end_date
 }
 
-// TODO: Fix this function to only return false when the row does not exist
-func rowExists(bonus bonusPost) bool {
+// processRows returns both the DBOs and the Marshalled DBOs; omit the return type you don't want
+func processRows(rows *sql.Rows) ([]BonusDBO, []byte) {
 
-    db := connect("savr")
-    defer db.Close()
-
-    start_date, end_date := getDates(bonus)
-
-    row := db.QueryRow("SELECT * from bonus where store = ? and start_date = ? and description = ? and discount = ? and link = ?", bonus.Supermarket, start_date, end_date, bonus.Bonus_description, bonus.Discount_description, bonus.Link) 
-
-    var b bonusDB
-    err := row.Scan(&b.Id, &b.Store, &b.Start_date, &b.End_date, &b.Description, &b.Discount, &b.Link)
-
-    if err == sql.ErrNoRows {
-        return false
-    }
-
-    return true
-}
-
-func processRows(rows *sql.Rows) []byte {
-
-    var ret_array []bonusDB
+    var ret_array []BonusDBO
 
     for rows.Next() {
 
-       var b bonusDB
+       var b BonusDBO
        err := rows.Scan(&b.Id, &b.Store, &b.Start_date, &b.End_date, &b.Description, &b.Discount, &b.Link)
        if err != nil {
            log.Fatal(err)
@@ -140,6 +140,6 @@ func processRows(rows *sql.Rows) []byte {
         log.Fatal(err)
     }
 
-    return ret
+    return ret_array, ret
 
 }

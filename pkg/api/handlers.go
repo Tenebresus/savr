@@ -1,6 +1,7 @@
 package api
 
 import (
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -45,7 +46,14 @@ func getBonusByStore(w http.ResponseWriter, req *http.Request) {
 
 func app(w http.ResponseWriter, req *http.Request) {
 
-    io.WriteString(w, "dit is een test")
+    tp, err := template.ParseFiles("templates/index.html")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    bonusDBOs := db.GetAllBonusDBO()
+
+    tp.Execute(w, bonusDBOs)
 
 }
 
