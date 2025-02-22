@@ -1,0 +1,38 @@
+<html>
+
+    <head>
+        <link rel="stylesheet" href="/static/index.css">
+    </head>
+
+    <body>
+        <div id="top-div">
+            <h1 id="title">Savr</h1>
+            <form action="/app">
+                <input placeholder="product" type="text" name="search" id="search"/>
+                <input type="submit" hidden/>
+            </form>
+        </div>
+        <div id="middle-div">
+
+            {{ range . }}
+            <div class="bonus">
+                <div class="bonus-left">
+                    <img href="{{ .Link }}" src="/static/ah.png">
+                </div>
+                <div class="bonus-right">
+                    <a>{{ .Description }}</a>
+                    <br>
+                    <a>{{ .Discount }}</a>
+                    <br>
+                    <a>Geldig tot: {{ .End_date }}</a>
+                </div>
+            </div>
+            {{ end }}
+
+        </div>
+        <div id="bottom-div">
+            <h1 id="copyright">© 2025 Tenebresus. All rights reserved.</h1>
+        </div>
+    </body>
+
+</html>

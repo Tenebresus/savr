@@ -31,6 +31,8 @@ type bonusPost struct {
 
 }
 
+// TODO: replace all functions with Find() that both returns []byte and []BonusDBO; it takes select and where as parameter
+
 func GetAllBonus() []byte {
 
     db := connect("savr") 
@@ -51,6 +53,20 @@ func GetAllBonusDBO() []BonusDBO {
     defer db.Close()
 
     rows, err := db.Query("SELECT * FROM bonus")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    ret, _ := processRows(rows)
+    return ret
+}
+
+func GetBonusWhereDescriptionDBO(search string) []BonusDBO {
+
+    db := connect("savr") 
+    defer db.Close()
+
+    rows, err := db.Query("SELECT * FROM bonus WHERE description like \"%" + search + "%\"")
     if err != nil {
         log.Fatal(err)
     }
@@ -89,14 +105,11 @@ func PostBonus(data []byte) {
     for _, bonusPost := range bonusPostData {
 
         start_date, end_date := getDates(bonusPost)
-        // TODO: Fix this query; the query looks fine, but the DB doesn't process it? When run by hand, the query works perfectly fine. Issue with mysql golang driver?
-        query += fmt.Sprintf("call InsertBonus(\"%s\", %d, %d, \"%s\", \"test\", \"%s\");\n", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Link)
+        query += fmt.Sprintf("call InsertBonus(\"%s\", %d, %d, \"%s\", \"%s\", \"%s\");", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Discount_description, bonusPost.Link)
 
     }
 
-    log.Println(query)
     _, err = db.Query(query)
-
     if err != nil {
         log.Println(err)
     } else {

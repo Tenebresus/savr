@@ -5,16 +5,23 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/tenebresus/savr/pkg/db"
 )
 
 func Run() {
 
+    // Main App
     http.HandleFunc("GET /app", app)
+    http.HandleFunc("GET /static/", static)
+
+    // API
     http.HandleFunc("GET /api/v1/bonus", getAllBonus)
     http.HandleFunc("POST /api/v1/bonus", postBonus)
     http.HandleFunc("GET /api/v1/bonus/{store}", getBonusByStore)
+
     http.ListenAndServe("0.0.0.0:8080", nil)
 
 }
@@ -46,14 +53,47 @@ func getBonusByStore(w http.ResponseWriter, req *http.Request) {
 
 func app(w http.ResponseWriter, req *http.Request) {
 
-    tp, err := template.ParseFiles("templates/index.html")
+    log.Println("Received request")
+
+    tp, err := template.ParseFiles("static/templates/index.html")
     if err != nil {
         log.Fatal(err)
     }
 
-    bonusDBOs := db.GetAllBonusDBO()
+    search := req.URL.Query().Get("search")
+    bonusDBOs := []db.BonusDBO{}
 
+    if search != "" {
+        bonusDBOs = db.GetBonusWhereDescriptionDBO(search)
+    } else {
+        bonusDBOs = db.GetAllBonusDBO()
+    }
     tp.Execute(w, bonusDBOs)
 
 }
 
+func static(w http.ResponseWriter, req *http.Request) {
+
+    path := strings.Split(req.URL.Path, "/")
+    file := path[2]
+
+    file_path := ""
+
+    if strings.HasSuffix(file, "css") {
+        file_path = "static/stylesheets/" + file
+        w.Header().Set("Content-Type", "text/css")
+    }
+
+    if strings.HasSuffix(file, "png") {
+        file_path = "static/images/" + file
+        w.Header().Set("Content-Type", "image/png")
+    }
+
+    data, err := os.ReadFile(file_path)
+    if err != nil {
+        log.Println(err)
+    }
+
+    w.Write(data)
+
+}

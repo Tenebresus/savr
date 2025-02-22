@@ -16,6 +16,7 @@ func connect(database_name string) *sql.DB {
         Net:    "tcp",
         Addr:   "127.0.0.1:3306",
         DBName: database_name, 
+        MultiStatements: true,
 
     }
 
