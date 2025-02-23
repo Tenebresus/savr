@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: savr-api-deployment
+  name: savr-api-deployment
+  namespace: savr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: savr-api-deployment
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: savr-api-deployment
+    spec:
+      containers:
+      - image: tenebresus/savr-api:latest
+        imagePullPolicy: Always
+        name: savr-api
+        ports:
+        - containerPort: 8080
+        resources: {}
+status: {}

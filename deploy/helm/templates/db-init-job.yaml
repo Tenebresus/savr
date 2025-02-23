@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-init
+  namespace: savr
+spec:
+  template:
+    spec:
+      containers:
+      - name: mysql-init
+        image: mysql:9.2
+        command: ["/bin/sh", "-c", "sleep 10; mysql -h savr-db -u root --password='password' < /tmp/init/init.sql"]
+        volumeMounts:
+        - name: db-init
+          mountPath: /tmp/init
+      restartPolicy: OnFailure
+      volumes:
+      - name: db-init
+        configMap:
+          name: savr-db-init-cm
+          items:
+          - key: "init.sql"
+            path: "init.sql"

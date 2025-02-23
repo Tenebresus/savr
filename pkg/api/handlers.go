@@ -22,7 +22,8 @@ func Run() {
     http.HandleFunc("POST /api/v1/bonus", postBonus)
     http.HandleFunc("GET /api/v1/bonus/{store}", getBonusByStore)
 
-    http.ListenAndServe("0.0.0.0:8080", nil)
+    log.Println("started listening on port 8080...")
+    http.ListenAndServe(":8080", nil)
 
 }
 
@@ -35,6 +36,7 @@ func getAllBonus(w http.ResponseWriter, req *http.Request) {
 
 func postBonus(w http.ResponseWriter, req *http.Request) {
 
+    log.Println("Received POST data from retriever...")
     postData, err := io.ReadAll(req.Body)
     if err != nil {
         log.Println(err)

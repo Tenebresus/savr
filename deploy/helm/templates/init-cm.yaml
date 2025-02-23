@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  init.sql: "CREATE DATABASE IF NOT EXISTS `savr`;\n\nuse `savr`;\n\nCREATE TABLE
+    IF NOT EXISTS `bonus` (\n  `id` int unsigned NOT NULL AUTO_INCREMENT,\n  `store`
+    varchar(255) DEFAULT NULL,\n  `start_date` int DEFAULT NULL,\n  `end_date` int
+    DEFAULT NULL,\n  `description` varchar(512) DEFAULT NULL,\n  `discount` varchar(512)
+    DEFAULT NULL,\n  `link` varchar(512) DEFAULT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB
+    AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n\nDELIMITER
+    ;;\nCREATE PROCEDURE IF NOT EXISTS`InsertBonus`(\n     IN p_store VARCHAR(255),\n\t
+    IN p_start_date int,\n\t IN p_end_date int,\n\t IN p_description VARCHAR(512),\n\t
+    IN p_discount VARCHAR(512),\n\t IN p_link VARCHAR(255)\n)\nBEGIN\n    IF NOT EXISTS
+    (select * from bonus where store = p_store and start_date = p_start_date and end_date
+    = p_end_date and description = p_description and discount = p_discount and link
+    = p_link) THEN\n    \tINSERT INTO bonus (store, start_date, end_date, description,
+    discount, link) VALUES (p_store, p_start_date, p_end_date, p_description, p_discount,
+    p_link);\n    END IF;\nEND;;\nDELIMITER ;\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: savr-db-init-cm
+  namespace: savr

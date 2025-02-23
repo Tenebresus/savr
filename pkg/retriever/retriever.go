@@ -27,7 +27,7 @@ func Run() {
 func postRequest(bonusData []byte) {
 
     data := strings.NewReader(string(bonusData))
-    _, err := http.Post("http://127.0.0.1:8080/api/v1/bonus", "application/json", data)
+    _, err := http.Post("http://savr-api-deployment:8080/api/v1/bonus", "application/json", data)
 
     if err != nil {
         log.Println(err)

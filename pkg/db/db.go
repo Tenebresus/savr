@@ -12,9 +12,9 @@ func connect(database_name string) *sql.DB {
     cfg := mysql.Config {
 
         User:   "root",
-        Passwd: "secret",
+        Passwd: "password",
         Net:    "tcp",
-        Addr:   "127.0.0.1:3306",
+        Addr:   "savr-db:3306",
         DBName: database_name, 
         MultiStatements: true,
 

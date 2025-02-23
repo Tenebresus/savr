@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: savr-retriever
+  namespace: savr
+spec:
+  schedule: "0 6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: savr-retriever
+            image: tenebresus/savr-retriever:latest
+            imagePullPolicy: Always
+          restartPolicy: OnFailure

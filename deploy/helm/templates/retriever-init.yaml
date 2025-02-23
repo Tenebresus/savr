@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: retriever-init
+  namespace: savr
+spec:
+  template:
+    spec:
+      containers:
+      - name: retriever-init
+        image: tenebresus/savr-retriever:latest
+      restartPolicy: OnFailure
+      initContainers:
+      - name: init
+        image: alpine
+        command: ["/bin/sh", "-c", "sleep 20"]

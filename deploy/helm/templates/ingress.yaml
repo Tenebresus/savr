@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: savr-api-ingress
+  namespace: savr
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: savr.theswamp.cloud
+    http:
+      paths:
+      - backend:
+          service:
+            name: savr-api-deployment
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
