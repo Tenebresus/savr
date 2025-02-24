@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: savr-mysql-pv-volume
-  namespace: savr
+  name: {{ .Values.name }}-mysql-pv-volume
+  namespace: {{ .Values.name }}
   labels:
     type: local
 spec:
@@ -12,13 +12,13 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data"
+    path: "/mnt/data/{{ .Values.name }}"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
-  namespace: savr
+  namespace: {{ .Values.name }}
 spec:
   storageClassName: manual
   accessModes:

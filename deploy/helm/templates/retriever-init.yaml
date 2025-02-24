@@ -2,13 +2,17 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: retriever-init
-  namespace: savr
+  namespace: {{ .Values.name }}
 spec:
   template:
     spec:
+      metadata:
+        labels:
+          date: "{{ now | unixEpoch }}"
       containers:
       - name: retriever-init
         image: tenebresus/savr-retriever:latest
+        imagePullPolicy: Always
       restartPolicy: OnFailure
       initContainers:
       - name: init

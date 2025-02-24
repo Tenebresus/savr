@@ -2,12 +2,15 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: savr-retriever
-  namespace: savr
+  namespace: {{ .Values.name }}
 spec:
   schedule: "0 6 * * *"
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            date: "{{ now | unixEpoch }}"
         spec:
           containers:
           - name: savr-retriever
