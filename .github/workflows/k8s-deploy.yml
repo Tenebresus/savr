@@ -24,6 +24,9 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
 
+      - name: Get current Git ref
+        run: echo "GIT_REF=$(git rev-parse --symbolic-full-name HEAD)" >> $GITHUB_ENV
+
       - name: Set up Kubernetes
         run: |
           mkdir $HOME/.kube; echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
@@ -35,9 +38,9 @@ jobs:
 
       - name: Set Helm values based on branch
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+          if [[ "${{ env.GIT_REF }}" == "refs/heads/develop" ]]; then
             echo "HELM_VALUES=dev-savr --set name=dev-savr ./deploy/helm" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "${{ env.GIT_REF }}" == "refs/heads/main" ]]; then
             echo "HELM_VALUES=savr ./deploy/helm" >> $GITHUB_ENV
           fi
 
