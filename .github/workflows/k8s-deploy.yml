@@ -1,0 +1,39 @@
+name: Deploy with Helm
+
+on:
+  workflow_run:
+    workflows: ["Docker Image CI"]  # Triggers after this workflow completes
+    types:
+      - completed  # Runs only when the workflow is completed
+
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Kubernetes
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig.yaml
+          export KUBECONFIG=$(pwd)/kubeconfig.yaml
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: latest
+
+      - name: Set Helm values based on branch
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "HELM_VALUES='dev-savr --set name=dev-savr ./deploy/helm'" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "HELM_VALUES='savr ./deploy/helm'" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy using Helm
+        run: |
+          helm upgrade --install ${{ env.HELM_VALUES }}
