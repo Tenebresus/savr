@@ -18,7 +18,7 @@ jobs:
 
       - name: Set up Kubernetes
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
+          mkdir $home/.kube; echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
 
       - name: Install Helm
         uses: azure/setup-helm@v3
