@@ -18,13 +18,7 @@ jobs:
 
       - name: Set up Kubernetes
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig.yaml
-          export KUBECONFIG=$(pwd)/kubeconfig.yaml
-
-      - name: Set up Kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.31.0' 
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
 
       - name: Install Helm
         uses: azure/setup-helm@v3
