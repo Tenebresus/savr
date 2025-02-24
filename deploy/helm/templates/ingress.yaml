@@ -3,8 +3,15 @@ kind: Ingress
 metadata:
   name: savr-api-ingress
   namespace: {{ .Values.name }}
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - {{ .Values.name }}.theswamp.cloud
+    secretName: {{ .Values.name }}-tls
   rules:
   - host: {{ .Values.name }}.theswamp.cloud
     http:
