@@ -3,12 +3,11 @@ kind: Job
 metadata:
   name: retriever-init
   namespace: {{ .Values.name }}
+  labels:
+    date: "{{ now | unixEpoch }}"
 spec:
   template:
     spec:
-      metadata:
-        labels:
-          date: "{{ now | unixEpoch }}"
       containers:
       - name: retriever-init
         image: tenebresus/savr-retriever:latest

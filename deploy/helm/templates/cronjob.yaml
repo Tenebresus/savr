@@ -3,14 +3,13 @@ kind: CronJob
 metadata:
   name: savr-retriever
   namespace: {{ .Values.name }}
+  labels:
+    date: "{{ now | unixEpoch }}"
 spec:
   schedule: "0 6 * * *"
   jobTemplate:
     spec:
       template:
-        metadata:
-          labels:
-            date: "{{ now | unixEpoch }}"
         spec:
           containers:
           - name: savr-retriever
