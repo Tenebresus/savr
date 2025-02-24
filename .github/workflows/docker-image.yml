@@ -5,22 +5,31 @@ on:
     branches: [ "develop" ]
 
 jobs:
-
-  build:
-
+  docker:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Log in to Docker Hub
-      env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build the savr API image
-      run: docker buildx build --push -t tenebresus/savr-api --platform linux/amd64,linux/arm/v7,linux/arm64 --build-arg CMD=api .
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Build the savr retriever image
-      run: docker buildx build --push -t tenebresus/savr-retriever --platform linux/amd64,linux/arm/v7,linux/arm64 --build-arg CMD=retriever .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push API
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/savr-api:latest
+
+      - name: Build and push retriever
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/savr-retriever:latest
