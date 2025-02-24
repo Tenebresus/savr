@@ -26,6 +26,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/savr-api:latest
+          build-args: |
+            CMD=api
 
       - name: Build and push retriever
         uses: docker/build-push-action@v6
@@ -33,3 +35,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/savr-retriever:latest
+          build-args: |
+            CMD=retriever
