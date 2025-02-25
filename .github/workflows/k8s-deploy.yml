@@ -8,11 +8,11 @@ on:
     types: [closed]
 
   workflow_run:
-    workflows: ["Docker Image CI"]  # Triggers after this workflow completes
+    workflows: ["Docker Image CI"]
     types:
-      - completed  # Runs only when the workflow is completed
+      - completed
 
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   deploy:
