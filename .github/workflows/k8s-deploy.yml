@@ -1,17 +1,6 @@
 name: Deploy with Helm
 
 on:
-
-  pull_request:
-    branches:
-      - main
-    types: [closed]
-
-  workflow_run:
-    workflows: ["Docker Image CI"]
-    types:
-      - completed
-
   workflow_dispatch:
 
 jobs:
