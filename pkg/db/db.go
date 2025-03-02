@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/tenebresus/savr/pkg/os"
 )
 
 func connect(database_name string) *sql.DB {
@@ -12,9 +13,9 @@ func connect(database_name string) *sql.DB {
     cfg := mysql.Config {
 
         User:   "root",
-        Passwd: "password",
+        Passwd: "root",
         Net:    "tcp",
-        Addr:   "savr-db:3306",
+        Addr:   os.GetEnv("DB_HOST") + ":3306",
         DBName: database_name, 
         MultiStatements: true,
 

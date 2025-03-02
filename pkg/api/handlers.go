@@ -29,7 +29,7 @@ func Run() {
 
 func getAllBonus(w http.ResponseWriter, req *http.Request) {
 
-    bonus := db.GetAllBonus()
+    _, bonus := db.Find("*")
     io.WriteString(w, string(bonus))
 
 }
@@ -41,6 +41,7 @@ func postBonus(w http.ResponseWriter, req *http.Request) {
     if err != nil {
         log.Println(err)
     } else {
+        db.PruneOldBonus()
         db.PostBonus(postData)
     }
 
@@ -48,7 +49,7 @@ func postBonus(w http.ResponseWriter, req *http.Request) {
 
 func getBonusByStore(w http.ResponseWriter, req *http.Request) {
 
-    bonus := db.GetBonusByStore(req.PathValue("store"))
+    _, bonus := db.Find("*", "store", "=", "\"" + req.PathValue(("store")) + "\"")
     io.WriteString(w, string(bonus))
 
 }
@@ -66,9 +67,9 @@ func app(w http.ResponseWriter, req *http.Request) {
     bonusDBOs := []db.BonusDBO{}
 
     if search != "" {
-        bonusDBOs = db.GetBonusWhereDescriptionDBO(search)
+        bonusDBOs, _ = db.Find("*", "description", "LIKE", "\"%" + search + "%\"")
     } else {
-        bonusDBOs = db.GetAllBonusDBO()
+        bonusDBOs, _ = db.Find("*")
     }
     tp.Execute(w, bonusDBOs)
 

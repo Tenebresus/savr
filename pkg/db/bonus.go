@@ -3,9 +3,10 @@ package db
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
-    "fmt"
+	"time"
 )
 
 type BonusDBO struct {
@@ -31,62 +32,47 @@ type bonusPost struct {
 
 }
 
-// TODO: replace all functions with Find() that both returns []byte and []BonusDBO; it takes select and where as parameter
-
-func GetAllBonus() []byte {
+func Find(slct string, where ...string) ([]BonusDBO, []byte) {
 
     db := connect("savr") 
     defer db.Close()
 
-    rows, err := db.Query("SELECT * FROM bonus")
+    query := buildQuery(slct, where...)
+    rows, err := db.Query(query)
     if err != nil {
         log.Fatal(err)
     }
 
-    _, ret := processRows(rows)
-    return ret
+    retDBO, ret := processRows(rows)
+    return retDBO, ret
 }
 
-func GetAllBonusDBO() []BonusDBO {
+func buildQuery(slct string, where ...string) string {
 
-    db := connect("savr") 
-    defer db.Close()
+    query := "SELECT " + slct + " FROM bonus"
+    if len(where) > 0 {
 
-    rows, err := db.Query("SELECT * FROM bonus")
-    if err != nil {
-        log.Fatal(err)
+        query += " WHERE "
+        for _, where_part := range where {
+            query += where_part + " "
+        }
+
     }
 
-    ret, _ := processRows(rows)
-    return ret
+    return query
+
 }
 
-func GetBonusWhereDescriptionDBO(search string) []BonusDBO {
+func PruneOldBonus() {
 
     db := connect("savr") 
     defer db.Close()
 
-    rows, err := db.Query("SELECT * FROM bonus WHERE description like \"%" + search + "%\"")
+    _, err := db.Query("DELETE FROM bonus where end_date < ?", time.Now().Unix())
     if err != nil {
         log.Fatal(err)
     }
 
-    ret, _ := processRows(rows)
-    return ret
-}
-
-func GetBonusByStore(store string) []byte {
-
-    db := connect("savr") 
-    defer db.Close()
-
-    rows, err := db.Query("SELECT * FROM bonus WHERE store = ?", store)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    _, ret := processRows(rows)
-    return ret
 }
 
 func PostBonus(data []byte) {

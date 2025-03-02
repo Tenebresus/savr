@@ -10,6 +10,9 @@ spec:
     spec:
       containers:
       - name: retriever-init
+        env:
+        - name: API_HOST
+        - value: savr-api-deployment
         image: tenebresus/savr-retriever:latest
         imagePullPolicy: Always
       restartPolicy: OnFailure
