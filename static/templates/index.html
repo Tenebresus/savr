@@ -5,6 +5,7 @@
     </head>
 
     <body>
+
         <div id="top-div">
             <h1 id="title">Savr</h1>
             <form action="/app">
@@ -17,7 +18,12 @@
             {{ range . }}
             <div class="bonus">
                 <div class="bonus-left">
+                    {{ if eq .Store "ah" }}
                     <img href="{{ .Link }}" src="/static/ah.png">
+                    {{ end }}
+                    {{ if eq .Store "lidl" }}
+                    <img href="{{ .Link }}" src="/static/lidl.png">
+                    {{ end }}
                 </div>
                 <div class="bonus-right">
                     <a>{{ .Description }}</a>
