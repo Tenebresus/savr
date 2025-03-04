@@ -24,6 +24,9 @@
                     {{ if eq .Store "lidl" }}
                     <img href="{{ .Link }}" src="/static/lidl.png">
                     {{ end }}
+                    {{ if eq .Store "deka" }}
+                    <img href="{{ .Link }}" src="/static/deka.png">
+                    {{ end }}
                 </div>
                 <div class="bonus-right">
                     <a>{{ .Description }}</a>

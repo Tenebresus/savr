@@ -7,7 +7,8 @@ import (
 
 	"github.com/tenebresus/savr/pkg/os"
 	"github.com/tenebresus/savr/pkg/retriever/ah"
-	"github.com/tenebresus/savr/pkg/retriever/lidl"
+//	"github.com/tenebresus/savr/pkg/retriever/lidl"
+	"github.com/tenebresus/savr/pkg/retriever/deka"
 )
 
 type Runner interface {
@@ -18,7 +19,8 @@ func Run() {
 
     var runners []Runner
     runners = append(runners, ah.Initialize())
-    runners = append(runners, lidl.Initialize())
+    runners = append(runners, deka.Initialize())
+//    runners = append(runners, lidl.Initialize())
 
     for _, runner := range runners {
         bonusData := runner.Run()

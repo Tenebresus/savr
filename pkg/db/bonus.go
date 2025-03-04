@@ -75,6 +75,7 @@ func PruneOldBonus() {
 
 }
 
+// TODO: check if start_date and end_date are "" (empty) if so; get the start and end date based on the day of the week: if its wednesday the start day is the monday in the same week and the end day is the monday next week
 func PostBonus(data []byte) {
 
     db := connect("savr")
