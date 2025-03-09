@@ -6,8 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
-	"time"
 
 	"golang.org/x/net/html"
 )
@@ -47,15 +45,12 @@ func (l Lidl) Run() []byte {
         for _, attr := range token.Attr {
             if attr.Key == "data-grid-data" {
 
-                start_date := int(time.Now().Unix())
-                end_date := int(time.Now().Add(time.Hour * 24 * 7).Unix())
-
                 json.Unmarshal([]byte(attr.Val), &lidl)
                 entry := map[string]string {
                     "supermarket": "lidl",
                     "bonus_description": lidl.FullTitle,
-                    "start_date": strconv.Itoa(start_date),
-                    "end_date": strconv.Itoa(end_date),
+                    "start_date": "",
+                    "end_date": "",
                     "discount_description": lidl.Price.Discount.DiscountTitle,
                     "link": "https://www.lidl.nl" + lidl.CanonicalPath,
                 }

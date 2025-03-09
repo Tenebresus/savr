@@ -32,6 +32,18 @@ type bonusPost struct {
 
 }
 
+var time_mapping map[string]int = map[string]int {
+
+    "Monday": 0,
+    "Tuesday": 1,
+    "Wednesday": 2,
+    "Thursday": 3,
+    "Friday": 4,
+    "Saturday": 5,
+    "Sunday": 6,
+
+}
+
 func Find(slct string, where ...string) ([]BonusDBO, []byte) {
 
     db := connect("savr") 
@@ -75,7 +87,6 @@ func PruneOldBonus() {
 
 }
 
-// TODO: check if start_date and end_date are "" (empty) if so; get the start and end date based on the day of the week: if its wednesday the start day is the monday in the same week and the end day is the monday next week
 func PostBonus(data []byte) {
 
     db := connect("savr")
@@ -91,9 +102,15 @@ func PostBonus(data []byte) {
 
     for _, bonusPost := range bonusPostData {
 
-        start_date, end_date := getDates(bonusPost)
-        query += fmt.Sprintf("call InsertBonus(\"%s\", %d, %d, \"%s\", \"%s\", \"%s\");", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Discount_description, bonusPost.Link)
+        start_date, end_date := 0, 0
 
+        if bonusPost.Start_date == "" && bonusPost.End_date == "" {
+            start_date, end_date = getDefaultStartDates()
+        } else {
+            start_date, end_date = convDates(bonusPost)
+        }
+
+        query += fmt.Sprintf("call InsertBonus(\"%s\", %d, %d, \"%s\", \"%s\", \"%s\");", bonusPost.Supermarket, start_date, end_date, bonusPost.Bonus_description, bonusPost.Discount_description, bonusPost.Link)
     }
 
     _, err = db.Query(query)
@@ -104,7 +121,20 @@ func PostBonus(data []byte) {
     }
 }
 
-func getDates(bonus bonusPost) (int, int) {
+func getDefaultStartDates() (int, int) {
+
+    now := time.Now()
+    base := now.Unix() - int64(now.Minute() * 60) - int64(now.Hour() * 60 * 60) - int64(now.Second())
+
+    today_string := now.Weekday().String()
+    start_date := int(base) - (time_mapping[today_string] * 24) * 3600
+    end_date := int(base) + ((7 - time_mapping[today_string]) * 24) * 3600
+
+    return start_date, end_date
+
+}
+
+func convDates(bonus bonusPost) (int, int) {
 
         start_date, err := strconv.Atoi(bonus.Start_date)
         if err != nil {

@@ -6,8 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
-	"time"
 
 	"golang.org/x/net/html"
 )
@@ -37,9 +35,6 @@ func (d Deka) Run() []byte {
     var description string
     var discount string
 
-    start_date := int(time.Now().Unix())
-    end_date := int(time.Now().Add(time.Hour * 24 * 7).Unix())
-
     for {
 
         tt := ht.Next()
@@ -66,8 +61,8 @@ func (d Deka) Run() []byte {
                 entry := map[string]string {
                     "supermarket": "deka",
                     "bonus_description": description,
-                    "start_date": strconv.Itoa(start_date),
-                    "end_date": strconv.Itoa(end_date),
+                    "start_date": "",
+                    "end_date": "",
                     "discount_description": discount,
                     "link": aanbiedingen_url,
                 }
